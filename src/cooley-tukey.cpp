@@ -3,6 +3,10 @@
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
+#include <omp.h>
+#include <chrono>
+#include <functional>
+#include <random>
 
 using namespace std;
 
@@ -119,16 +123,174 @@ const vector<complex<double>> fft_radix2(const vector<complex<double>> &sequence
     }
     return dft;
 }
+const vector<complex<double>> fft_radix2_parallel(const vector<complex<double>> &sequence){
+    vector<complex<double>> dft(sequence);
+    if(sequence.size()==0){
+        throw invalid_argument("The sequence size must be different from zero");
+    }
+    else if((sequence.size()&(sequence.size()-1))!=0){
+        throw invalid_argument("The sequence size must be a power of 2");
+    }
+    else if(sequence.size()==1){
+        return dft;
+    }
+    reverse_bit_order(dft);
+
+    // Iteration on the different depths(sub_size) of the problem
+    // We'll start from subproblems of size 1 and go on from there
+    // sub_size is the current size of the computed partial DTF in our problem
+    for(unsigned int sub_size=1;sub_size<dft.size();sub_size*=2){
+
+        // At every inner iteration we consider two adjecent subproblems
+        // j is the index of the current subproblem
+        // Since we consider two problem for iteration j has to skip the adjecent subproblem
+        #pragma omp parallel for schedule(static) shared(dft) collapse(2)
+        for(unsigned int j=0;j<dft.size();j+=2*sub_size){
+            
+            //Iteration on the two adjecent subproblems
+            //We just apply the formula
+            for(unsigned int z=0;z<sub_size;z++){
+                auto angle = complex<double> (0,-2*M_PI*z/(2*sub_size));
+                auto phase_factor = exp(angle);
+                auto even_term = dft[j+z];
+                auto odd_term = dft[j+z+sub_size]*phase_factor;
+                dft[j+z] = even_term + odd_term;
+                dft[j+z+sub_size] = even_term - odd_term;
+            }
+        }
+    }
+    return dft;
+}
+const vector<complex<double>> fft_radix2_lookup(const vector<complex<double>> &sequence){
+    vector<complex<double>> dft(sequence);
+    vector<double> sin_table(sequence.size());
+
+    for(unsigned int i=0;i<sequence.size();i++){
+        sin_table[i] = sin(2*M_PI*static_cast<float>(i)/sequence.size());
+    }
+
+    
+    if(sequence.size()==0){
+        throw invalid_argument("The sequence size must be different from zero");
+    }
+    else if((sequence.size()&(sequence.size()-1))!=0){
+        throw invalid_argument("The sequence size must be a power of 2");
+    }
+    else if(sequence.size()==1){
+        return dft;
+    }
+    reverse_bit_order(dft);
+
+    // Iteration on the different depths(sub_size) of the problem
+    // We'll start from subproblems of size 1 and go on from there
+    // sub_size is the current size of the computed partial DTF in our problem
+    for(unsigned int sub_size=1;sub_size<dft.size();sub_size*=2){
+
+        // At every inner iteration we consider two adjecent subproblems
+        // j is the index of the current subproblem
+        // Since we consider two problem for iteration j has to skip the adjecent subproblem
+        // #pragma omp parallel for schedule(static) shared(dft)
+        for(unsigned int j=0;j<dft.size();j+=2*sub_size){
+            
+            //Iteration on the two adjecent subproblems
+            //We just apply the formula
+            for(unsigned int z=0;z<sub_size;z++){
+                unsigned int idx = z * dft.size() / (2*sub_size);
+                auto phase_factor = complex<double>(sin_table[idx + dft.size()/4], -sin_table[idx]);             
+                // cout << "At " << z << " " << phase_factor << " " << phase_factor_exp << endl;
+                // cout << "J : " << j << " Z : " << z << " Subsize : " << sub_size << " z/2*sub_size " << static_cast<double>(z)/(2.0*static_cast<double>(sub_size))<< endl;
+                // cout << "IDX: " << idx << endl;
+                auto even_term = dft[j+z];
+                auto odd_term = dft[j+z+sub_size] * phase_factor;
+                dft[j+z] = even_term + odd_term;
+                dft[j+z+sub_size] = even_term - odd_term;
+            }
+        }
+    }
+    return dft;
+}
+const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<double>> &sequence){
+    vector<complex<double>> dft(sequence);
+    vector<double> sin_table(sequence.size());
+    #pragma omp parallel for schedule(static) shared(sin_table)
+    for(unsigned int i=0;i<sequence.size();i++){
+        sin_table[i] = sin(2*M_PI*static_cast<float>(i)/sequence.size());
+    }
+
+    
+    if(sequence.size()==0){
+        throw invalid_argument("The sequence size must be different from zero");
+    }
+    else if((sequence.size()&(sequence.size()-1))!=0){
+        throw invalid_argument("The sequence size must be a power of 2");
+    }
+    else if(sequence.size()==1){
+        return dft;
+    }
+    reverse_bit_order(dft);
+
+    // Iteration on the different depths(sub_size) of the problem
+    // We'll start from subproblems of size 1 and go on from there
+    // sub_size is the current size of the computed partial DTF in our problem
+    for(unsigned int sub_size=1;sub_size<dft.size();sub_size*=2){
+
+        // At every inner iteration we consider two adjecent subproblems
+        // j is the index of the current subproblem
+        // Since we consider two problem for iteration j has to skip the adjecent subproblem
+        #pragma omp parallel for schedule(static) shared(dft) collapse(2)
+        for(unsigned int j=0;j<dft.size();j+=2*sub_size){
+            
+            //Iteration on the two adjecent subproblems
+            //We just apply the formula
+            for(unsigned int z=0;z<sub_size;z++){
+                unsigned int idx = z * dft.size() / (2*sub_size);
+                auto phase_factor = complex<double>(sin_table[idx + dft.size()/4], -sin_table[idx]);
+                auto even_term = dft[j+z];
+                auto odd_term = dft[j+z+sub_size] * phase_factor;
+                dft[j+z] = even_term + odd_term;
+                dft[j+z+sub_size] = even_term - odd_term;
+            }
+        }
+    }
+    return dft;
+}
+
+
+const vector<complex<double>> time_function(function<const vector<complex<double>>(const vector<complex<double>>)> f, const vector<complex<double>> &sequence, string name){
+    auto start = std::chrono::high_resolution_clock::now();
+    auto fft = f(sequence);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    cout << "Time taken by " << name << ":   \t" 
+         << duration.count()/1000.0 << " milliseconds" << endl;
+    return fft;
+
+}
+
+void verify(const vector<complex<double>> &standard, const vector<complex<double>> &sequence, string name){
+    for(unsigned int i=0;i<standard.size();++i){
+        if(abs(standard[i]-sequence[i])>1e-7){
+            cout << "Error in " << name << " at index " << i << endl;
+            cout << "Expected: " << standard[i] << " Got: " << sequence[i] << endl;
+        }
+    }
+    cout << "Test passed for " << name << endl;
+}
 
 int main(){
-    unsigned int constexpr dim = 32;
+    unsigned int constexpr dim = 1048576;
     vector<complex<double>> sequence(dim);
     for(unsigned int i=0; i<dim; ++i){
-        sequence[i] = complex<double>(i,0.0);
+        double rand_real = static_cast <double>(rand()) / static_cast<double>(RAND_MAX);
+        double rand_i = static_cast <double>(rand()) / static_cast<double>(RAND_MAX);
+        sequence[i] = complex<double>(rand_real,rand_i);
     }
-    auto fft = fft_radix2(sequence);
-    for(auto &data : fft){
-        cout << data << " ";
-    }
-    cout << endl;
+    auto fft_ref = time_function(fft_radix2, sequence, "normal");
+    auto fft = time_function(fft_radix2_parallel, sequence, "parallel");
+    verify(fft_ref, fft, "parallel");
+    fft = time_function(fft_radix2_lookup, sequence, "lookup");
+    verify(fft_ref, fft, "lookup");
+    fft = time_function(fft_radix2_lookup_parallel, sequence, "lookup p");
+    verify(fft_ref, fft, "lookup parallel");
+
 }
