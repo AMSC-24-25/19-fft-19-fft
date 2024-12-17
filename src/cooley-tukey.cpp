@@ -236,14 +236,16 @@ const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<do
     // We'll start from subproblems of size 1 and go on from there
     // sub_size is the current size of the computed partial DTF in our problem
     for(unsigned int sub_size=1;sub_size<dft.size();sub_size*=2){
-
+        // Rescale factor to access sin table using z
+        unsigned int idx_rescale = dft.size() / (2*sub_size);
 
         // Parallelize both loops with collapse(2). Each work unit will compute two ouput values
-        #pragma omp parallel for schedule(static) shared(dft) collapse(2)
+        #pragma omp parallel for schedule(static) shared(dft) shared(idx_rescale) collapse(2)
         // At every inner iteration we consider two adjecent subproblems
         // j is the index of the current subproblem
         // Since we consider two problem for iteration j has to skip the adjecent subproblem
         for(unsigned int j=0;j<dft.size();j+=2*sub_size){
+            
             
             //Iteration on the two adjecent subproblems
             //We just apply the formula
@@ -254,7 +256,7 @@ const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<do
                 // and, since sin and cos are shifted by pi/2, we have:
                 // cos(2 * M_PI * z / (2 * sub_size)) = sin_table[z * dft.size() / (2 * sub_size) + dft.size() / 4]
 
-                unsigned int idx = z * dft.size() / (2*sub_size);
+                unsigned int idx = z * idx_rescale;
                 auto phase_factor = complex<double>(sin_table[idx + dft.size()/4], -sin_table[idx]);
                 auto even_term = dft[j+z];
                 auto odd_term = dft[j+z+sub_size] * phase_factor;
