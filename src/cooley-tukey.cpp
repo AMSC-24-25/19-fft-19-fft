@@ -68,6 +68,8 @@ void inline reverse_bit_order(vector<T> &sequence){
     }
     unsigned int num_bit = static_cast<int> (log2(seq_size));
     unsigned int swap_position = 0;
+    // sequence can be reversed in parallel
+    #pragma omp parallel for schedule(static) shared(sequence) firstprivate(num_bit) private(swap_position)
     for(unsigned int i=0;i<seq_size;i++){
         swap_position = reverse_number_bit(i,num_bit);
         if(swap_position>i){
