@@ -211,7 +211,10 @@ const vector<complex<double>> fft_radix2_lookup(const vector<complex<double>> &s
 }
 const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<double>> &sequence){
     vector<complex<double>> dft(sequence);
+
+    // List of all sin (and cos) values used in the computation (0, 2pi/N_SAMPLES, 4pi/N_SAMPLES, ..., (N-1)2pi/N_SAMPLES)
     vector<double> sin_table(sequence.size());
+    // Create the list of sin values in parallel
     #pragma omp parallel for schedule(static) shared(sin_table)
     for(unsigned int i=0;i<sequence.size();i++){
         sin_table[i] = sin(2*M_PI*static_cast<float>(i)/sequence.size());
@@ -234,15 +237,23 @@ const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<do
     // sub_size is the current size of the computed partial DTF in our problem
     for(unsigned int sub_size=1;sub_size<dft.size();sub_size*=2){
 
+
+        // Parallelize both loops with collapse(2). Each work unit will compute two ouput values
+        #pragma omp parallel for schedule(static) shared(dft) collapse(2)
         // At every inner iteration we consider two adjecent subproblems
         // j is the index of the current subproblem
         // Since we consider two problem for iteration j has to skip the adjecent subproblem
-        #pragma omp parallel for schedule(static) shared(dft) collapse(2)
         for(unsigned int j=0;j<dft.size();j+=2*sub_size){
             
             //Iteration on the two adjecent subproblems
             //We just apply the formula
             for(unsigned int z=0;z<sub_size;z++){
+
+                // phase factor e^(-i * 2 * M_PI * z / ( 2 * sub_size)) = cos(2 * M_PI * z / (2 * sub_size)) - i * sin(2 * M_PI * z / (2 * sub_size))
+                // sin(2 * M_PI * z / (2 * sub_size)) = sin_table[z * dft.size() / (2 * sub_size)]
+                // and, since sin and cos are shifted by pi/2, we have:
+                // cos(2 * M_PI * z / (2 * sub_size)) = sin_table[z * dft.size() / (2 * sub_size) + dft.size() / 4]
+
                 unsigned int idx = z * dft.size() / (2*sub_size);
                 auto phase_factor = complex<double>(sin_table[idx + dft.size()/4], -sin_table[idx]);
                 auto even_term = dft[j+z];
