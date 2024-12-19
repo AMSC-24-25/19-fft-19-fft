@@ -121,7 +121,6 @@ In this implementation, we chose an **in-place iterative** approach for the Fast
 The algorithm iteratively computes the FFT of the sequence by progressively breaking it down into smaller subsequences. Each iteration processes the sequence and updates it based on the FFT computation. By avoiding recursion, the iterative approach reduces the function call overhead, making it faster and more efficient. 
 Although we use an auxiliary array to hold the results for clarity and separation, this is purely for organizational purposes. It is possible to modify the input sequence directly during computation (i.e., overwrite it), which would further reduce memory usage, making the implementation truly in-place. However, for clarity, we opted to keep the input and output separate during the FFT calculation.
 
-
 ### Bit-Reversal of the Sequence
 The Cooley-Tukey Radix-2 FFT algorithm requires the input sequence to be rearranged according to bit-reversal order. To understand this, consider the sequence indices as binary numbers. At each stage of the algorithm, the sequence is split into two sub-sequences based on whether the indices are even or odd.  
 In binary terms, this corresponds to right-shifting the index positions and separating those ending in 0 from those ending in 1. By recursively applying this process, we observe that the indices are reordered in a way that reflects the bit-reversal of their original positions.  
@@ -149,3 +148,41 @@ The new positions of the elements in x[n]x[n] correspond to the binary represent
 ### OpenMP
 
 Parallelism was implemented using the OpenMP library by applying parallelization directives to for loops. The inherently parallelizable sections include the bit-reversal computation, the sine values precomputation and finally the calculation of DFT values for each subproblem of a specified size.
+so we should rearrange our sequence $x[n]$ to:
+
+$[000,100,010,110,001,101,011,111]$
+
+The new positions of the elements in $x[n]$ correspond to the binary representation of their indices, with the bits read from right to left!
+
+## Usage
+
+### Generating a Random Sequence and Computing FFT
+```cpp
+unsigned int constexpr dim = 1048576;  // Set sequence size (must be a power of 2)
+vector<complex<double>> sequence(dim);
+
+// Fill the sequence with random values
+for (unsigned int i = 0; i < dim; ++i) {
+    double rand_real = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+    double rand_imag = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
+    sequence[i] = complex<double>(rand_real, rand_imag);
+}
+
+// Compute the FFT of the sequence
+vector<complex<double>> result = fft_radix2(sequence);
+vector<complex<double>> inverse_result = inverse_fft_radix_2(result);
+```
+## Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/fft-implementation.git
+```
+2. Compile the .cpp file with **OpenMP** support
+```bash
+g++ -fopenmp cooley-tukey.cpp -o cooley-tukey
+```
+3. Run the program
+```bash
+./cooley-tukey
+```
