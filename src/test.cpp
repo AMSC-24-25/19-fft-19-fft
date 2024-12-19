@@ -43,7 +43,7 @@ verify(
 
 int main() {
     // 2^20 elements
-    constexpr unsigned int dim = 1048576;
+    constexpr size_t dim = 1048576;
     vector<complex<double>> sequence(dim);
     for(size_t i=0; i<dim; ++i){
         double rand_real =

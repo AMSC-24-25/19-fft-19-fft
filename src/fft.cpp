@@ -1,4 +1,6 @@
 #include "../include/fft.hpp"
+#include <algorithm>
+#include <map>
 
 /* PRIVATE UTILITY FUNCTIONS */
 template <typename T>
@@ -149,6 +151,59 @@ AMSC::fft_radix2(
 }
 
 void
+AMSC::ifft_radix2(
+    const std::vector<std::complex<double>> &input,
+    std::vector<std::complex<double>> &output
+) {
+    output = input;
+
+    if(input.size()==0){
+        throw std::invalid_argument(
+                "The sequence size must be different from zero");
+    }
+    else if((input.size()&(input.size()-1))!=0){
+        throw std::invalid_argument(
+                "The sequence size must be a power of 2");
+    }
+    else if(input.size()==1){
+        return;
+    }
+
+    reverse_bit_order(output);
+
+    // Iteration on the different depths(sub_size) of the problem
+    // We'll start from subproblems of size 1 and go on from there
+    // sub_size is the current size of the computed partial DTF 
+    // in our problem
+    for(size_t sub_size=1; sub_size<output.size(); sub_size*=2) {
+
+        // At every inner iteration we consider two adjecent 
+        // subproblems
+        // j is the index of the current subproblem
+        // Since we consider two problem for iteration j has 
+        // to skip the adjecent subproblem
+        for(size_t j=0; j<output.size(); j+=2*sub_size){
+            
+            //Iteration on the two adjecent subproblems
+            //We just apply the formula
+            for(size_t z=0; z<sub_size; z++){
+                auto angle =
+                    std::complex<double>(0,2*M_PI*z/(2*sub_size));
+                auto phase_factor = exp(angle);
+                auto even_term = output[j+z];
+                auto odd_term = output[j+z+sub_size]*phase_factor;
+                output[j+z] = even_term + odd_term;
+                output[j+z+sub_size] = even_term - odd_term;
+            }
+        }
+    }
+
+    for(size_t i = 0; i < output.size(); ++i) {
+        output[i] *= 1.0/input.size();
+    }
+}
+
+void
 AMSC::fft_radix2_parallel(
     const std::vector<std::complex<double>> &input,
     std::vector<std::complex<double>> &output
@@ -178,7 +233,6 @@ AMSC::fft_radix2_parallel(
         // j is the index of the current subproblem
         // Since we consider two problem for iteration j has 
         // to skip the adjecent subproblem
-// #pragma omp parallel for schedule(static) shared(dft) collapse(2)
 #pragma omp parallel for schedule(static) shared(output) collapse(2)
         for(size_t j=0; j<output.size(); j+=2*sub_size){
             
@@ -194,6 +248,61 @@ AMSC::fft_radix2_parallel(
                 output[j+z+sub_size] = even_term - odd_term;
             }
         }
+    }
+}
+
+void
+AMSC::ifft_radix2_parallel(
+    const std::vector<std::complex<double>> &input,
+    std::vector<std::complex<double>> &output
+) {
+    output = input;
+
+    if(input.size()==0){
+        throw std::invalid_argument(
+                "The sequence size must be different from zero");
+    }
+    else if((input.size()&(input.size()-1))!=0){
+        throw std::invalid_argument(
+                "The sequence size must be a power of 2");
+    }
+    else if(input.size()==1){
+        return;
+    }
+
+    reverse_bit_order_parallel(output);
+
+    // Iteration on the different depths(sub_size) of the problem
+    // We'll start from subproblems of size 1 and go on from there
+    // sub_size is the current size of the computed partial DTF 
+    // in our problem
+    for(size_t sub_size=1; sub_size<output.size(); sub_size*=2) {
+
+        // At every inner iteration we consider two adjecent 
+        // subproblems
+        // j is the index of the current subproblem
+        // Since we consider two problem for iteration j has 
+        // to skip the adjecent subproblem
+#pragma omp parallel for schedule(static) shared(output) collapse(2)
+        for(size_t j=0; j<output.size(); j+=2*sub_size){
+            
+            //Iteration on the two adjecent subproblems
+            //We just apply the formula
+            for(size_t z=0; z<sub_size; z++){
+                auto angle =
+                    std::complex<double>(0,2*M_PI*z/(2*sub_size));
+                auto phase_factor = exp(angle);
+                auto even_term = output[j+z];
+                auto odd_term = output[j+z+sub_size]*phase_factor;
+                output[j+z] = even_term + odd_term;
+                output[j+z+sub_size] = even_term - odd_term;
+            }
+        }
+    }
+
+#pragma omp parallel for schedule(static)
+    for(size_t i = 0; i < output.size(); ++i) {
+        output[i] *= 1.0/input.size();
     }
 }
 

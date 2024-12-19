@@ -13,7 +13,19 @@ fft_radix2(
 );
 
 void
+ifft_radix2(
+    const std::vector<std::complex<double>> &input,
+    std::vector<std::complex<double>> &output
+);
+
+void
 fft_radix2_parallel(
+    const std::vector<std::complex<double>> &input,
+    std::vector<std::complex<double>> &output
+);
+
+void
+ifft_radix2_parallel(
     const std::vector<std::complex<double>> &input,
     std::vector<std::complex<double>> &output
 );
