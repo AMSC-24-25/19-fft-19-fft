@@ -11,7 +11,7 @@ This project provides an efficient implementation of the Fast Fourier Transform 
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Mathematical Foundation](#mathematical-foundation)
-3. [Implementation Details](#functions)
+3. [Implementation Details](#implementation-details)
 4. [Usage](#usage)
 5. [Installation](#installation)
 
