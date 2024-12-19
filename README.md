@@ -130,11 +130,11 @@ Now considering just the first sub-sequence with the successive step we would ha
 
 $[0\textcolor{blue}{0}\textcolor{red}{0}, 1\textcolor{blue}{0}\textcolor{red}{0}]$ and $[0\textcolor{blue}{1}\textcolor{red}{0}, 1\textcolor{blue}{1}\textcolor{red}{0}]$ 
 
-so we should rearrange our sequence $x[n]$ 
+so we should rearrange our sequence $x[n]$ to:
 
 $[000,100,010,110,001,101,011,111]$
 
-The new positions of the elements in x[n]x[n] correspond to the binary representation of their indices, with the bits read from right to left!
+The new positions of the elements in $x[n]$ correspond to the binary representation of their indices, with the bits read from right to left!
 
 ## Usage
 
