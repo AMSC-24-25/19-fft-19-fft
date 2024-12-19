@@ -153,36 +153,3 @@ so we should rearrange our sequence $x[n]$ to:
 $[000,100,010,110,001,101,011,111]$
 
 The new positions of the elements in $x[n]$ correspond to the binary representation of their indices, with the bits read from right to left!
-
-## Usage
-
-### Generating a Random Sequence and Computing FFT
-```cpp
-unsigned int constexpr dim = 1048576;  // Set sequence size (must be a power of 2)
-vector<complex<double>> sequence(dim);
-
-// Fill the sequence with random values
-for (unsigned int i = 0; i < dim; ++i) {
-    double rand_real = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-    double rand_imag = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-    sequence[i] = complex<double>(rand_real, rand_imag);
-}
-
-// Compute the FFT of the sequence
-vector<complex<double>> result = fft_radix2(sequence);
-vector<complex<double>> inverse_result = inverse_fft_radix_2(result);
-```
-## Installation
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/fft-implementation.git
-```
-2. Compile the .cpp file with **OpenMP** support
-```bash
-g++ -fopenmp cooley-tukey.cpp -o cooley-tukey
-```
-3. Run the program
-```bash
-./cooley-tukey
-```
