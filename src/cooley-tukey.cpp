@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 /**
  * @brief Reverses the bits of an unsigned integer.
  * 
@@ -23,7 +22,11 @@ using namespace std;
  * @return The unsigned integer value with reversed bits.
  * @throws std::invalid_argument if `num_bit` is zero.
  */
-unsigned int reverse_number_bit(const unsigned int &value,const unsigned int &num_bit){
+unsigned int
+reverse_number_bit(
+    const unsigned int &value,
+    const unsigned int &num_bit
+){
     unsigned int reversed = 0;
     if(value==0)
         return 0;
@@ -58,7 +61,10 @@ unsigned int reverse_number_bit(const unsigned int &value,const unsigned int &nu
  * Index:     000  100  010  110  001  101  011  111
  */
 template <typename T>
-void inline reverse_bit_order(vector<T> &sequence){
+void inline
+reverse_bit_order(
+    vector<T> &sequence
+){
     unsigned int seq_size = sequence.size();
     if(sequence.size()==0){
         throw invalid_argument("The sequence size must be different from zero");
@@ -88,7 +94,10 @@ void inline reverse_bit_order(vector<T> &sequence){
  * @return A vector of complex numbers representing the DFT of the input sequence.
  * @throws std::invalid_argument if the sequence size is zero or not a power of 2
  */
-const vector<complex<double>> fft_radix2(const vector<complex<double>> &sequence){
+vector<complex<double>>
+fft_radix2(
+    const vector<complex<double>> &sequence
+){
     vector<complex<double>> dft(sequence);
     if(sequence.size()==0){
         throw invalid_argument("The sequence size must be different from zero");
@@ -125,7 +134,11 @@ const vector<complex<double>> fft_radix2(const vector<complex<double>> &sequence
     }
     return dft;
 }
-const vector<complex<double>> fft_radix2_parallel(const vector<complex<double>> &sequence){
+
+vector<complex<double>>
+fft_radix2_parallel(
+    const vector<complex<double>> &sequence
+){
     vector<complex<double>> dft(sequence);
     if(sequence.size()==0){
         throw invalid_argument("The sequence size must be different from zero");
@@ -163,7 +176,11 @@ const vector<complex<double>> fft_radix2_parallel(const vector<complex<double>> 
     }
     return dft;
 }
-const vector<complex<double>> fft_radix2_lookup(const vector<complex<double>> &sequence){
+
+vector<complex<double>>
+fft_radix2_lookup(
+    const vector<complex<double>> &sequence
+){
     vector<complex<double>> dft(sequence);
     vector<double> sin_table(sequence.size());
 
@@ -211,7 +228,11 @@ const vector<complex<double>> fft_radix2_lookup(const vector<complex<double>> &s
     }
     return dft;
 }
-const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<double>> &sequence){
+
+const vector<complex<double>>
+fft_radix2_lookup_parallel(
+    const vector<complex<double>> &sequence
+){
     vector<complex<double>> dft(sequence);
 
     // List of all sin (and cos) values used in the computation (0, 2pi/N_SAMPLES, 4pi/N_SAMPLES, ..., (N-1)2pi/N_SAMPLES)
@@ -271,7 +292,12 @@ const vector<complex<double>> fft_radix2_lookup_parallel(const vector<complex<do
 }
 
 
-const vector<complex<double>> time_function(function<const vector<complex<double>>(const vector<complex<double>>)> f, const vector<complex<double>> &sequence, string name){
+const vector<complex<double>>
+time_function(
+    function<const vector<complex<double>>(const vector<complex<double>>)> f,
+    const vector<complex<double>> &sequence,
+    string name
+) {
     auto start = std::chrono::high_resolution_clock::now();
     auto fft = f(sequence);
     auto stop = std::chrono::high_resolution_clock::now();
@@ -282,7 +308,12 @@ const vector<complex<double>> time_function(function<const vector<complex<double
 
 }
 
-void verify(const vector<complex<double>> &standard, const vector<complex<double>> &sequence, string name){
+void
+verify(
+    const vector<complex<double>> &standard,
+    const vector<complex<double>> &sequence,
+    string name
+){
     for(unsigned int i=0;i<standard.size();++i){
         if(abs(standard[i]-sequence[i])>1e-7){
             cout << "Error in " << name << " at index " << i << endl;
@@ -292,7 +323,8 @@ void verify(const vector<complex<double>> &standard, const vector<complex<double
     cout << "Test passed for " << name << endl;
 }
 
-int main(){
+int
+main(){
     unsigned int constexpr dim = 1048576;
     vector<complex<double>> sequence(dim);
     for(unsigned int i=0; i<dim; ++i){
