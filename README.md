@@ -8,12 +8,21 @@ This project provides an efficient implementation of the Fast Fourier Transform 
 - Includes a bit-reversal function to reorder sequence indices.
 - Inverse FFT function to compute the inverse transform.
 
+
 ## Table of Contents
 1. [Prerequisites](#prerequisites)
 2. [Mathematical Foundation](#mathematical-foundation)
+   - [Discrete Fourier Transform (DFT)](#1-discrete-fourier-transform-dft)
+   - [Cooley-Tukey Radix-2 FFT](#2-cooley-tukey-radix-2-fft)
+     - [Mathematical Formula for Radix-2 FFT](#21-mathematical-formula-for-radix-2-fft)
+     - [Optimization for Real Sequences](#22-optimization-for-real-sequences)
+   - [Inverse DFT (IDFT)](#3-inverse-dft-idft)
 3. [Implementation Details](#implementation-details)
-4. [Usage](#usage)
-5. [Installation](#installation)
+   - [In-Place Iterative FFT](#1-in-place-iterative-fft)
+   - [Bit-Reversal of the Sequence](#2-bit-reversal-of-the-sequence)
+   - [Twiddle Factors Calculation](#3-twiddle-factors-calculation)
+   - [OpenMP](#4-openmp)
+
 
 ## Prerequisites
 - C++11 or later for code compatibility.
@@ -94,14 +103,6 @@ $$
 If we now take $x_{even}[n] = x[2n]$ and $x_{odd}[n] = x[2n+1]$ we can compute the DFT of $z[n] = x_{even}[n] + i\cdot x_{odd}[n]$ at the cost of one DFT of size $\frac{N}{2}$.  
 Using these DFTs, we can then compute the DFT of $x[n]$ by exploiting the symmetries inherent in real-valued sequences.
 
-#### 2.3 **Twiddle factors calculation**
-To optimize the DFT computation, we can avoid calculating the exponential of a complex number at each iteration. Instead, we precompute all sine and cosine values before the iterations begin, significantly speeding up the process. This is achieved by creating an array, $sin\_table$, containing elements 
-$$\sin\left(\frac{2\pi i}{dft\ size}\right), i \in \left(0, size\right)$$ prior to executing the loops.
-
-During the loop, the corresponding sine value can be accessed using the formula: $$sin\_table\_idx = z \cdot \frac{dft\ size}{2 \cdot sub\ size}$$ where $sub\ size$ is the size of the current subproblem being processed, $dft\ size$ is the size of the overall DFT, and $z$ is the index of the element within the subproblem.
-For cosine values, we leverage the phase relationship: $\cos(x)$ is $\frac{\pi}{2}$ out of phase with $\sin(x)$. Thus, if $\sin(k) = sin\_table[idx]$, then $\cos(k) = sin\_table[idx + \frac{dft\ size}{4}]$.
-
-
 ### 3. **Inverse DFT (IDFT)**
 
 The **Inverse DFT** is used to recover the original time-domain sequence from its frequency-domain representation. The formula for the IDFT has the same structure of the one for the DFT, minus the exponent sign.  
@@ -117,11 +118,11 @@ It is obvious then that the same reasoning can be applied also to compute the In
 
 In this implementation, we chose an **in-place iterative** approach for the Fast Fourier Transform (FFT). While an additional array is used for storing the output to maintain separation, the algorithm could theoretically overwrite the input array itself during computation, achieving an in-place solution.
 
-### In-Place Iterative FFT
+### 1. In-Place Iterative FFT
 The algorithm iteratively computes the FFT of the sequence by progressively breaking it down into smaller subsequences. Each iteration processes the sequence and updates it based on the FFT computation. By avoiding recursion, the iterative approach reduces the function call overhead, making it faster and more efficient. 
 Although we use an auxiliary array to hold the results for clarity and separation, this is purely for organizational purposes. It is possible to modify the input sequence directly during computation (i.e., overwrite it), which would further reduce memory usage, making the implementation truly in-place. However, for clarity, we opted to keep the input and output separate during the FFT calculation.
 
-### Bit-Reversal of the Sequence
+### 2. Bit-Reversal of the Sequence
 The Cooley-Tukey Radix-2 FFT algorithm requires the input sequence to be rearranged according to bit-reversal order. To understand this, consider the sequence indices as binary numbers. At each stage of the algorithm, the sequence is split into two sub-sequences based on whether the indices are even or odd.  
 In binary terms, this corresponds to right-shifting the index positions and separating those ending in 0 from those ending in 1. By recursively applying this process, we observe that the indices are reordered in a way that reflects the bit-reversal of their original positions.  
 Ultimately, when the recursion reaches the base case, the sequence is fully rearranged according to the reversed binary order of the indices.
@@ -142,14 +143,23 @@ so we should rearrange our sequence $x[n]$
 
 $[000,100,010,110,001,101,011,111]$
 
-The new positions of the elements in x[n]x[n] correspond to the binary representation of their indices, with the bits read from right to left!
+The new positions of the elements in $x[n]$ correspond to the binary representation of their indices, with the bits read from right to left!
 
+### 3. **Twiddle factors calculation**
+To optimize the DFT computation, we can avoid calculating the exponential of a complex number at each iteration. Instead, we precompute all sine and cosine values before the iterations begin, significantly speeding up the process.  
+This is achieved by creating an array $sin\\_table$ containing elements 
 
-### OpenMP
+$$ sin\\_table[i] = sin\left(\frac{2\pi i}{N}\right), \quad i = 0, 1, 2, \dots, N-1$$
+
+During the loop, the corresponding sine value is $sin\\_table[idx]$ where 
+
+$$idx = z \cdot \frac{N}{2 \cdot sub\\_size}$$ 
+
+where $sub\\_size$ is the size of the current subproblem being processed, $N$ is the length of our input sequence, and $z$ is the index of the element within the subproblem.
+For cosine values, we leverage the phase relationship:  $\cos(x) = \sin[x + (\pi/2)]$. Thus: 
+
+$$sin\\_table[idx] = \sin\left(\frac{2\pi \cdot idx}{N}\right) \to sin\\_table\left[idx + \frac{N}{4}\right] = \sin\left(\frac{2\pi \cdot \left(idx + \frac{N}{4}\right)}{N}\right) = \sin\left(\frac{2\pi \cdot idx}{N} + \frac{\pi}{2}\right) = \cos\left(\frac{2\pi \cdot idx}{N}\right) $$.
+
+### 4. OpenMP
 
 Parallelism was implemented using the OpenMP library by applying parallelization directives to for loops. The inherently parallelizable sections include the bit-reversal computation, the sine values precomputation and finally the calculation of DFT values for each subproblem of a specified size.
-so we should rearrange our sequence $x[n]$ to:
-
-$[000,100,010,110,001,101,011,111]$
-
-The new positions of the elements in $x[n]$ correspond to the binary representation of their indices, with the bits read from right to left!
