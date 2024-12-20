@@ -443,3 +443,61 @@ AMSC::fft_radix2_lookup_parallel(
         }
     }
 }
+
+void 
+AMSC::fft_radix2_real_lookup(
+    const std::vector<double> &input,
+    std::vector<std::complex<double>> &output
+) {
+    const unsigned int N = input.size();
+    output.resize(N); //Make sure that the output can hold N values
+    
+    // Input validation
+    if(N==0){
+        throw std::invalid_argument("Size must be non zero");
+    }
+    else if( (N&(N-1))!=0 ){
+        throw std::invalid_argument("Size must be a power of 2");
+    }
+    else if(N==1){
+        output[0] = std::complex<double>(input[0],0.0); // If the sequence has length one then the DFT is the same sequence
+        return;
+    }
+
+    // Let's take two real valued vectors w[n] and g[n] of size N
+    // We create the vector z[n] = w[n] + i*g[n]
+    // We have that w[n] = (z[n] + z*[n])/2 applying the DTF to both sides
+    // W[k] = (Z[k] + Z*[N-k])/2 (knowing that DTF{x*[n]} = X*[N-k])
+    // We now take as w[n] = x[2n] = x_even[n] and g[n] = x[2n+1] = x_odd[n]
+
+    // Construct a complex sequence z of half the size from the input sequence.
+    // The real parts are the even-indexed elements, and the imaginary parts are the odd-indexed elements.
+    std::vector<std::complex<double>> z(N/2);
+    for(unsigned int i=0;i<N/2;++i){
+        z[i] = std::complex<double>(input[2*i],input[2*i+1]);
+    }
+
+    std::vector<std::complex<double>> Z(z.size());
+    // Computing the FFT of z
+    fft_radix2_lookup(z,Z);
+
+    std::complex<double> X_even,X_odd;
+
+
+    X_even = (Z[0] + conj(Z[0]))/2.0;
+    X_odd = std::complex<double>(0.0,-1.0)*(Z[0] - conj(Z[0]))/2.0;
+
+    output[0] = X_even + X_odd;  // Handling the zero component
+    output[N/2] = X_even - X_odd; // Handling the Nyquist component 
+
+    for(unsigned int i=1;i<N/2;++i){
+        // Even and odd parts are derived from symmetry properties.
+        X_even = (Z[i] + conj(Z[N/2-i]))/2.0;
+        X_odd = std::complex<double>(0.0,-1.0)*(Z[i] - conj(Z[N/2-i]))/2.0;
+
+        // Apply the phase factor to the odd component and combine. 
+        std::complex<double> phase_factor = exp(std::complex<double>(0,-2*M_PI*i/N));
+        output[i] = X_even + phase_factor*X_odd;
+        output[N-i] = std::conj(output[i]);
+    }
+}

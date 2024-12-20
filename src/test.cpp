@@ -11,10 +11,11 @@
 using namespace AMSC;
 using namespace std;
 
+template <typename T>
 vector<complex<double>>
 time_function(
-    function<void(const vector<complex<double>>&, vector<complex<double>>&)> f,
-    const vector<complex<double>> &sequence,
+    function<void(const vector<T>&, vector<complex<double>>&)> f,
+    const vector<T> &sequence,
     string name
 ) {
     auto start = std::chrono::high_resolution_clock::now();
@@ -48,24 +49,33 @@ void test_speed_correctness_fft() {
     constexpr size_t max_dim = 1048576;
     for(size_t dim = 4; dim <= max_dim; dim*=2) {
         vector<complex<double>> sequence(dim);
-
+        vector<double> real_sequence(dim);
+        
         for(size_t i=0; i<dim; ++i){
             double rand_real =
                 static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
             double rand_i =
                 static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
             sequence[i] = complex<double>(rand_real,rand_i);
+            real_sequence[i] = rand_real;
         }
 
         cout << "[TEST dim=" << dim<< "]" << endl;
-        auto fft_ref = time_function(fft_radix2, sequence, "normal");
-        auto fft = time_function(fft_radix2_parallel, sequence, "parallel");
+        auto fft_ref = time_function<complex<double>>(fft_radix2, sequence, "normal");
+        auto fft = time_function<complex<double>>(fft_radix2_parallel, sequence, "parallel");
         verify(fft_ref, fft, "parallel");
-        fft = time_function(fft_radix2_lookup, sequence, "lookup");
+        fft = time_function<complex<double>>(fft_radix2_lookup, sequence, "lookup");
         verify(fft_ref, fft, "lookup");
-        fft = time_function(fft_radix2_lookup_parallel, sequence, "lookup p");
+        fft = time_function<complex<double>>(fft_radix2_lookup_parallel, sequence, "lookup p");
         verify(fft_ref, fft, "lookup parallel");
         
+        // We need to create a sequence with real values to test the fft_radix2_real_lookup function
+        for(size_t i=0;i<dim;++i){
+            sequence[i] = std::complex<double>(real_sequence[i],0.0);
+        }
+        fft_radix2_lookup(sequence,fft_ref);
+        fft = time_function<double>(fft_radix2_real_lookup,real_sequence,"real optimization lookup");
+        verify(fft_ref,fft,"real optimization lookup");
         cout << "\n\n"; 
     }
 }
