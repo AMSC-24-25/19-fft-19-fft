@@ -7,6 +7,18 @@
 namespace AMSC {
 
 void
+fft_recursive(
+    const std::vector<std::complex<double>>& input,
+    std::vector<std::complex<double>> &output
+);
+
+void
+fft_recursive_parallel(
+    const std::vector<std::complex<double>>& input,
+    std::vector<std::complex<double>> &output
+);
+
+void
 fft_radix2(
     const std::vector<std::complex<double>> &input,
     std::vector<std::complex<double>> &output

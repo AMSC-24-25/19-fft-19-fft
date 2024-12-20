@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <map>
 
+#define DEPTH 3
+
 /* PRIVATE UTILITY FUNCTIONS */
 template <typename T>
 void inline
