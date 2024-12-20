@@ -44,7 +44,7 @@ fft_radix2_lookup_parallel(
 );
 
 void
-fft_radix2_real_lookup(
+fft_radix2_real(
     const std::vector<double> &input,
     std::vector<std::complex<double>> &output
 );

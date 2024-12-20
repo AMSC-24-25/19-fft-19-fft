@@ -445,13 +445,13 @@ AMSC::fft_radix2_lookup_parallel(
 }
 
 void 
-AMSC::fft_radix2_real_lookup(
+AMSC::fft_radix2_real(
     const std::vector<double> &input,
     std::vector<std::complex<double>> &output
 ) {
     const unsigned int N = input.size();
     output.resize(N); //Make sure that the output can hold N values
-    
+
     // Input validation
     if(N==0){
         throw std::invalid_argument("Size must be non zero");
@@ -479,7 +479,7 @@ AMSC::fft_radix2_real_lookup(
 
     std::vector<std::complex<double>> Z(z.size());
     // Computing the FFT of z
-    fft_radix2_lookup(z,Z);
+    fft_radix2(z,Z);
 
     std::complex<double> X_even,X_odd;
 

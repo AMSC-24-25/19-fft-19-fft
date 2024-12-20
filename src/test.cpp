@@ -74,8 +74,8 @@ void test_speed_correctness_fft() {
             sequence[i] = std::complex<double>(real_sequence[i],0.0);
         }
         fft_radix2_lookup(sequence,fft_ref);
-        fft = time_function<double>(fft_radix2_real_lookup,real_sequence,"real optimization lookup");
-        verify(fft_ref,fft,"real optimization lookup");
+        fft = time_function<double>(fft_radix2_real,real_sequence,"real optimization");
+        verify(fft_ref,fft,"real optimization");
         cout << "\n\n"; 
     }
 }
