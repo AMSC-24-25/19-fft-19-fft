@@ -101,7 +101,115 @@ reverse_bit_order_parallel(
         }
     }
 }
+
+void
+fft_recursive_parallel_(
+    const std::vector<std::complex<double>>& input,
+    std::vector<std::complex<double>> &output,
+    size_t cutoff
+) {
+    // base case
+    if(input.size() == 1) {
+        output = input;
+        return;
+    }
+
+    // Partitioning the input array into the even and odd-indexed
+    // arrays
+    std::vector<std::complex<double>> input_even(input.size()/2);
+    std::vector<std::complex<double>> input_odd(input.size()/2);
+    for(size_t i = 0; i < input.size()/2; ++i) {
+        input_even[i] = input[2*i];
+        input_odd[i] = input[2*i+1];
+    }
+
+    // Compute recursively the two dfts
+    std::vector<std::complex<double>> fft_even;
+    std::vector<std::complex<double>> fft_odd;
+
+    if(cutoff > 0) {
+        #pragma omp task firstprivate(input_even, fft_even, cutoff)
+        fft_recursive_parallel_(input_even, fft_even, cutoff-1);
+
+        fft_recursive_parallel_(input_odd, fft_odd, cutoff-1);
+
+        #pragma omp taskwait
+    } else {
+        AMSC::fft_recursive(input_even, fft_even);
+        AMSC::fft_recursive(input_odd, fft_odd);
+    }
+
+    output.reserve(input.size());
+    output.resize(input.size());
+    for(size_t k = 0; k < input.size()/2; ++k) {
+        std::complex<double> angle(
+            0,
+            -(2*M_PI*k)/input.size()
+        );
+        std::complex<double> w_N = std::exp(angle);
+
+        output[k] = fft_even[k] + w_N*fft_odd[k];
+        output[k+input.size()/2] =
+                    fft_even[k] - w_N*fft_odd[k];
+    }
+}
 /*********************/
+
+
+void
+AMSC::fft_recursive(
+    const std::vector<std::complex<double>>& input,
+    std::vector<std::complex<double>> &output
+) {
+    // base case
+    if(input.size() == 1) {
+        output = input;
+        return;
+    }
+
+    // Partitioning the input array into the even and odd-indexed
+    // arrays
+    std::vector<std::complex<double>> input_even(input.size()/2);
+    std::vector<std::complex<double>> input_odd(input.size()/2);
+    for(size_t i = 0; i < input.size()/2; ++i) {
+        input_even[i] = input[2*i];
+        input_odd[i] = input[2*i+1];
+    }
+
+    // Compute recursively the two dfts
+    std::vector<std::complex<double>> fft_even;
+    std::vector<std::complex<double>> fft_odd;
+    fft_recursive(input_even, fft_even);
+    fft_recursive(input_odd, fft_odd);
+
+    output.reserve(input.size());
+    output.resize(input.size());
+    for(size_t k = 0; k < input.size()/2; ++k) {
+        std::complex<double> angle(
+            0,
+            -(2*M_PI*k)/input.size()
+        );
+        std::complex<double> w_N = std::exp(angle);
+
+        output[k] = fft_even[k] + w_N*fft_odd[k];
+        output[k+input.size()/2] =
+                    fft_even[k] - w_N*fft_odd[k];
+    }
+}
+
+void
+AMSC::fft_recursive_parallel(
+    const std::vector<std::complex<double>>& input,
+    std::vector<std::complex<double>> &output
+) {
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            fft_recursive_parallel_(input, output, DEPTH);
+        }
+    }
+}
 
 
 void
