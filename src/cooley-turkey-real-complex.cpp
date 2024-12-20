@@ -274,11 +274,14 @@ const vector<complex<double>> fft_radix22(const vector<complex<double>> &sequenc
 }
 
 
+int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        cerr << "Usage: " << argv[0] << " <sequence_size (power of 2)>" << endl;
+        return 1;
+    }
 
-int main() {
-    srand(time(0));
-
-    unsigned int constexpr dim = 1048576;
+    unsigned int dim = atoi(argv[1]);
+    
     vector<complex<double>> sequence(dim);
     for (unsigned int i = 0; i < dim; ++i) {
         sequence[i] = complex<double>(i + rand() * 2, i / 2);
@@ -312,7 +315,7 @@ int main() {
     */
 
     duration = duration_cast<microseconds>(end_time - start_time);
-    cout << "FFT Execution Time separated : " << duration.count() << " microseconds" << endl;
+    cout << "FFT Execution Time separated: " << duration.count() << " microseconds" << endl;
 
 
     return 0;
