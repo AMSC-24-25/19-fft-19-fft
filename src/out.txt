@@ -1,0 +1,231 @@
+[TEST dim=4]
+Time taken by normal:   	1.271 milliseconds
+Time taken by parallel:   	21.049 milliseconds
+Test passed for parallel
+Time taken by lookup:   	3.101 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	6.236 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	1.716 milliseconds
+Error in real optimization lookup at index 0
+Expected: (2.87016,0) Got: (1.62329,0)
+
+
+[TEST dim=8]
+Time taken by normal:   	0.613 milliseconds
+Time taken by parallel:   	0.127 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.272 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	0.07 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.086 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=16]
+Time taken by normal:   	0.376 milliseconds
+Time taken by parallel:   	0.585 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.197 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	0.379 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.102 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=32]
+Time taken by normal:   	0.207 milliseconds
+Time taken by parallel:   	0.207 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.15 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	5.273 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.179 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=64]
+Time taken by normal:   	1.347 milliseconds
+Time taken by parallel:   	3.581 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.396 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	0.148 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.338 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=128]
+Time taken by normal:   	0.986 milliseconds
+Time taken by parallel:   	0.213 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.747 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	62.627 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.217 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=256]
+Time taken by normal:   	0.738 milliseconds
+Time taken by parallel:   	73.113 milliseconds
+Test passed for parallel
+Time taken by lookup:   	0.507 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	75.85 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	0.44 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=512]
+Time taken by normal:   	1.671 milliseconds
+Time taken by parallel:   	81.103 milliseconds
+Test passed for parallel
+Time taken by lookup:   	1.098 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	82.271 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	1.125 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=1024]
+Time taken by normal:   	4.117 milliseconds
+Time taken by parallel:   	6.157 milliseconds
+Test passed for parallel
+Time taken by lookup:   	6.577 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	2.111 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	1.804 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=2048]
+Time taken by normal:   	8.708 milliseconds
+Time taken by parallel:   	40.067 milliseconds
+Test passed for parallel
+Time taken by lookup:   	11.321 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	12.303 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	4.066 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=4096]
+Time taken by normal:   	18.101 milliseconds
+Time taken by parallel:   	9.432 milliseconds
+Test passed for parallel
+Time taken by lookup:   	17.347 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	3.608 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	7.813 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=8192]
+Time taken by normal:   	37.871 milliseconds
+Time taken by parallel:   	38.353 milliseconds
+Test passed for parallel
+Time taken by lookup:   	27.933 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	9.461 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	15.968 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=16384]
+Time taken by normal:   	79.477 milliseconds
+Time taken by parallel:   	27.097 milliseconds
+Test passed for parallel
+Time taken by lookup:   	56.263 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	17.563 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	34.022 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=32768]
+Time taken by normal:   	176.169 milliseconds
+Time taken by parallel:   	69.195 milliseconds
+Test passed for parallel
+Time taken by lookup:   	110.171 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	40.966 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	70.524 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=65536]
+Time taken by normal:   	366.327 milliseconds
+Time taken by parallel:   	96.877 milliseconds
+Test passed for parallel
+Time taken by lookup:   	217.728 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	69.605 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	147.631 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=131072]
+Time taken by normal:   	768.149 milliseconds
+Time taken by parallel:   	203.936 milliseconds
+Test passed for parallel
+Time taken by lookup:   	463.617 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	118.362 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	304.027 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=262144]
+Time taken by normal:   	1630.29 milliseconds
+Time taken by parallel:   	395.616 milliseconds
+Test passed for parallel
+Time taken by lookup:   	965.034 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	249.802 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	628.329 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=524288]
+Time taken by normal:   	3447.96 milliseconds
+Time taken by parallel:   	689.915 milliseconds
+Test passed for parallel
+Time taken by lookup:   	2037.43 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	429.071 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	1317.38 milliseconds
+Test passed for real optimization lookup
+
+
+[TEST dim=1048576]
+Time taken by normal:   	7320.85 milliseconds
+Time taken by parallel:   	1386.82 milliseconds
+Test passed for parallel
+Time taken by lookup:   	4301.55 milliseconds
+Test passed for lookup
+Time taken by lookup p:   	690.63 milliseconds
+Test passed for lookup parallel
+Time taken by real optimization lookup:   	2777.07 milliseconds
+Test passed for real optimization lookup
+
+
+Test test_fft_ifft passed
+Test test_ifft_fft passed
