@@ -25,15 +25,3 @@ The following plot compares the execution times for both FFT methods:
 
 ![FFT Execution Times](fft_execution_times.png)
 
-## Files
-
-- `fft_execution_times.png`: The plot showing the FFT execution times for both methods.
-- `README.md`: This file providing an overview of the project.
-
-## Conclusion
-
-From the plot, we observe that the separated FFT method provides a significant speed-up for larger input sizes, making it a more efficient choice for larger FFT computations.
-
----
-
-Feel free to explore and adjust the parameters for further analysis!
