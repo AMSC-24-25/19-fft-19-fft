@@ -43,6 +43,12 @@ fft_radix2_lookup_parallel(
     std::vector<std::complex<double>> &output
 );
 
+void
+fft_radix2_real_lookup(
+    const std::vector<double> &input,
+    std::vector<std::complex<double>> &output
+);
+
 }; // namespace AMSC
 
 #endif //__AMSC_FFT__H 
