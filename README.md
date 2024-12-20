@@ -163,4 +163,4 @@ $$sin\\_table[idx] = \sin\left(\frac{2\pi \cdot idx}{N}\right) \to sin\\_table\l
 ### 4. OpenMP
 
 Parallelism was implemented using the OpenMP library by applying parallelization directives to for loops. The inherently parallelizable sections include the bit-reversal computation, the sine values precomputation and finally the calculation of DFT values for each subproblem of a specified size.
-![alt text](https://github.com/AMSC-24-25/19-fft-19-fft/blob/main/data/image.jpg?raw=true)
+![alt text](https://github.com/AMSC-24-25/19-fft-19-fft/blob/main/data/Figure_1.png?raw=true)
